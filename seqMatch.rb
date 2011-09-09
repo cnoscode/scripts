@@ -18,18 +18,18 @@ f3_headers = []
 f5_headers = []
 
 while f3_entry = f3_file.next_entry #&& f5_entry = f5_file.next_entry
-	if f3_entry.definition =~ pattern	 
-		f3_headers.push(f3_entry.definition.gsub(/F3/,""))
-	end
-	while f5_entry = f5_file.next_entry
-		if f5_entry.definition =~ pattern
-			f5_headers.push(f5_entry.definition.gsub(/F5/,""))
-		end
-		f3_headers.each do |f3_line|
-			f5_headers.each do |f5_line|
-				f3_out.puts f3_entry if f3_line == f5_line
-				f5_out.puts f5_entry if f5_line == f3_line
-			end
-		end
-	end
+  if f3_entry.definition =~ pattern   
+    f3_headers.push(f3_entry.definition.gsub(/F3/,""))
+  end
+  while f5_entry = f5_file.next_entry
+    if f5_entry.definition =~ pattern
+      f5_headers.push(f5_entry.definition.gsub(/F5/,""))
+    end
+    f3_headers.each do |f3_line|
+      f5_headers.each do |f5_line|
+        f3_out.puts f3_entry if f3_line == f5_line
+        f5_out.puts f5_entry if f5_line == f3_line
+      end
+    end
+  end
 end
