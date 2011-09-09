@@ -1,34 +1,35 @@
 require 'rubygems'
 require 'bio'
 
-f3_cs = Bio::FlatFile.auto("/Users/cjose/Desktop/testfiles/MD_20091218_r4200_PE_1s8p50c_Sample1_F3.csfasta")
-f5_cs = Bio::FlatFile.auto("/Users/cjose/Desktop/testfiles/MD_20091218_r4200_PE_1s8p50c_Sample1_F5-P2.csfasta")
+# find csfasta/qual files 
+cs_files = Dir.glob("/Users/cjose/Desktop/testfiles/*.csfasta")
+qual_files = Dir.glob("/Users/cjose/Desktop/testfiles/*.qual")
 
+# output files
 f3_out = File.new("/Users/cjose/Desktop/f3.csfasta", "w")
 f5_out = File.new("/Users/cjose/Desktop/f5.csfasta", "w")
 
-a = []
-f3_cs.pos = 0
-f5_cs.pos = 0
+f3_file = Bio::FastaFormat.open(cs_files[0])
+f5_file = Bio::FastaFormat.open(cs_files[1])
 
+# header pattern to match
+pattern = /[0-9]*[_][0-9]*[_][0-9]*[_]/
+f3_headers = []
+f5_headers = []
 
-while f3_entry = f3_cs.next_entry && f5_entry = f5_cs.next_entry
-  if f3_entry =~ /^>/
-    start_of_entry = f3_cs.pos
-    if f3_entry =~ /F3/
-      start_of_f3 = f3_cs.pos
-      length = start_of_f3 - start_of_entry
-      header = f3_entry.read(length)
-      f3_out.puts header
-    end
-  end
+while f3_entry = f3_file.next_entry #&& f5_entry = f5_file.next_entry
+	if f3_entry.definition =~ pattern	 
+		f3_headers.push(f3_entry.definition.gsub(/F3/,""))
+	end
+	while f5_entry = f5_file.next_entry
+		if f5_entry.definition =~ pattern
+			f5_headers.push(f5_entry.definition.gsub(/F5/,""))
+		end
+		f3_headers.each do |f3_line|
+			f5_headers.each do |f5_line|
+				f3_out.puts f3_entry if f3_line == f5_line
+				f5_out.puts f5_entry if f5_line == f3_line
+			end
+		end
+	end
 end
-  
-# F3, F5-P2
-f3_cs.close
-f5_cs.close
-
- 
-
-
-
