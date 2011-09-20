@@ -10,8 +10,6 @@ f3_out = File.new("/Users/cjose/Desktop/f3.csfasta", "w")
 f5_out = File.new("/Users/cjose/Desktop/f5.csfasta", "w")
 
 while !f5_file.eof? && !f3_file.eof?
-  #puts tmpf3_pos = f3_file.pos
-  #puts tmpf5_pos = f5_file.pos
   f3_ln = f3_file.readline.chomp
   f5_ln = f5_file.readline.chomp
   f3_ln =~ /^>(\d*_\d*_\d*_)/
@@ -21,33 +19,30 @@ while !f5_file.eof? && !f3_file.eof?
  
   if f3_id == f5_id 
     f3_out.puts f3_ln
-    f3_out.puts f3_file.readline # start of next f3 header
-    f5_file.readline # start of next f5 header
-  else # >1_10_140_F3 and >1_9_1912_F5-P2
-    f3_file.readline # outputs last seq line then eof
-    f5_file.readline # end of seq for >1_7_239_F5-P2; start of next header >1_9_1912_F5-P2
-  
-    ctr = 0
-    max_buff = 2
+    f3_out.puts f3_file.readline 
+    f5_  file.readline 
+  else 
+    f3_file.readline 
+    f5_file.readline   
+     ctr = 0
+    max_buff = 7 # 8 total (current F5 line)
     # start of buffer storage
-    buffer = []   
-     buffer = f5_ln# >1_9_1912_F5-P2, f3_id = >1_10_140_F3
+    buffer = []
+    buffer.push f5_ln   
     while ctr < max_buff  
-    ln = f5_file.readline
+    ln = f5_file.readline.chomp
       if ln =~ /^>/
+        buffer.push ln
         ctr += 1
-        buffer = ln
-        p buffer
       end #end if
-      
-#      buffer.each do |header|
-#        if header =~ /#{f3_id}/
-#          f3_out.puts f3_ln
-#          f3_out.puts f3_file.readline
-#        end 
-#      end # end do iterator
-        
     end # end while
+    p buffer
+    buffer.each do |header|
+     if header =~ /#{f3_id}/
+       f3_out.puts f3_ln
+       f3_out.puts f3_file.readline 
+     end 
+     end # end do iterator
   end #end top level if 
 end # while
 f3_file.close
