@@ -31,7 +31,8 @@ while !f5_file.eof? && !f3_file.eof?
           f3_out.puts f3_file.readline
           f5_file.readline
           break
-        else
+        elsif ctr == 6
+          f3_file.readline
           ctr += 1
         end #end if
        end
@@ -46,15 +47,14 @@ f5_file.close
 
 f5_file = File.open(cs_files[1])
 f3_prime = File.open("/Users/cjose/Desktop/f3.csfasta", "r")
-f5_file.rewind
 
 while !f5_file.eof? && !f3_prime.eof?
   f3pr_ln = f3_prime.readline.chomp
   f5_ln = f5_file.readline.chomp
   f5_ln =~ /^>(\d*_\d*_\d*_)/
-  f5_id = $2
+  f5_id = $1
   f3pr_ln =~ /^>(\d*_\d*_\d*_)/
-  f3pr_id = $2
+  f3pr_id = $1
    
   if f5_id == f3pr_id
     f5_out.puts f5_ln
@@ -63,16 +63,18 @@ while !f5_file.eof? && !f3_prime.eof?
   else
     f3_prime.readline
     ctr = 0          
-    while ctr < 7 # 7 entries in buffer
-    ln = f3_prime.readline.chomp
+    while ctr < 2# 7 entries in buffer
+    puts ln = f3_prime.readline.chomp
+    # ln = f3_prime.readline.chomp
       if ln =~ /^>/
         if ln =~ /#{f5_id}/
           f5_out.puts f5_ln
           f5_out.puts f5_file.readline
           f3_prime.readline
           break
-        else 
-          ctr += 1
+        elsif ctr == 1
+          f5_file.readline
+          ctr += 1 
         end #end if
       end
     end 
