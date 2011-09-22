@@ -22,7 +22,8 @@ while !f5_file.eof? && !f3_file.eof?
     f5_file.readline 
   else
     f5_file.readline
-    ctr = 0          
+    ctr = 0
+    break_pos = f5_file.pos          
     while ctr < 7 # check next 7 entries 
     ln = f5_file.readline.chomp
       if ln =~ /^>/
@@ -36,8 +37,8 @@ while !f5_file.eof? && !f3_file.eof?
           ctr += 1
         end #end if
        end
-     end 
-
+    end 
+		f5_file.pos = break_pos
   end #end top level if
 end 
 
@@ -58,29 +59,26 @@ while !f5_file.eof? && !f3_prime.eof?
    
   if f5_id == f3pr_id
     f5_out.puts f5_ln
-    f5_out.puts f5_file.readline 
+    f5_out.puts f5_file.readline
     f3_prime.readline 
   else
     f3_prime.readline
     ctr = 0          
-    while ctr < 2# 7 entries in buffer
-    puts ln = f3_prime.readline.chomp
-    # ln = f3_prime.readline.chomp
-      if ln =~ /^>/
-        if ln =~ /#{f5_id}/
-          f5_out.puts f5_ln
-          f5_out.puts f5_file.readline
-          f3_prime.readline
-          break
-        elsif ctr == 1
-          f5_file.readline
-          ctr += 1 
-        end #end if
-      end
+    break_pos = f3_prime.pos
+    while ctr < 2 # 7 entries in buffer
+    ln = f3_prime.readline.chomp
+   	if ln =~ /^>/
+    	if ln =~ /#{f5_id}/
+      	f5_out.puts f5_ln
+      	f5_out.puts f5_file.readline
+      	f3_prime.readline
+      	break
+      elsif ctr == 1
+      	f5_file.readline
+        ctr += 1 
+      end # end if
+     end
     end 
-
-  end #end top level if
-end  
-
-
-
+		f3_prime.pos = break_pos
+  end # end top level if
+end 
