@@ -74,14 +74,13 @@ while !f5_cs_file.eof? && !f3_prime.eof?
       	f5_cs_out.puts f5_ln
       	f5_cs_out.puts f5_cs_file.readline
       	f3_prime.readline
-        f5_pos = f5_cs_file.pos
         f3_pos = f3_prime.pos
         break
       else
       	f5_cs_file.readline
         ctr += 1 
       end # end if
-   end
+    end
   end 
   end # end top level if
 end 
