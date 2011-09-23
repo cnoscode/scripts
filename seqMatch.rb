@@ -37,8 +37,8 @@ while !f5_cs_file.eof? && !f3_cs_file.eof?
           ctr += 1
         end #end if
        end
-    end 
-		f5_cs_file.pos = break_pos
+    end
+    f5_cs_file.pos = break_pos
   end #end top level if
 end 
 
@@ -83,6 +83,5 @@ while !f5_cs_file.eof? && !f3_prime.eof?
       end # end if
    end
   end 
-		#f3_prime.pos = break_pos
   end # end top level if
 end 
