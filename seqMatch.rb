@@ -1,86 +1,82 @@
-require 'rubygems'
+files = Dir.glob("/Users/cjose/scripts/*csfasta")
+f3_file = File.open(files[0], "r")
+f5_file = File.open(files[1], "r")
+f3_out = File.new("/Users/cjose/Desktop/f3out.csfasta", "w")
 
-f3_cs_qual = Dir.glob("/Users/cjose/Desktop/scripts/*csfasta")
-
-f3_cs_file = File.open(f3_cs_qual[0]) # csfasta
-f5_cs_file = File.open(f3_cs_qual[1]) # qual
-
-f3_cs_out = File.new("/Users/cjose/Desktop/f3_out.csfasta", "w")
-f5_cs_out = File.new("/Users/cjose/Desktop/f5_out.csfasta", "w")
-
-while !f5_cs_file.eof? && !f3_cs_file.eof?
-  f3_ln = f3_cs_file.readline.chomp
-  f5_ln = f5_cs_file.readline.chomp
+# F3 against F5 => F3`
+while !f5_file.eof? && !f3_file.eof?
+  f3_ln = f3_file.readline
+  f5_ln = f5_file.readline
   f3_ln =~ /^>(\d*_\d*_\d*_)/
   f3_id = $1
   f5_ln =~ /^>(\d*_\d*_\d*_)/
   f5_id = $1
 
   if f3_id == f5_id 
-    f3_cs_out.puts f3_ln
-    f3_cs_out.puts f3_cs_file.readline 
-    f5_cs_file.readline 
+    f3_out.puts f3_ln
+    f3_out.puts f3_file.readline
+    f5_file.readline
   else
-    f5_cs_file.readline
+    f5_file.readline # start of next header line
+    f5_pos = f5_file.pos
     ctr = 0
-    break_pos = f5_cs_file.pos          
-    while ctr < 10 # check next 7 entries 
-    f5_ln = f5_cs_file.readline.chomp
-      if f3_ln =~ /^>/
-        if f3_ln =~ /#{f3_id}/
-          f3_cs_out.puts f3_ln
-          f3_cs_out.puts f3_cs_file.readline
-          f5_cs_file.readline
+    while ctr < 7
+      f5_buf = f5_file.readline
+      if f5_buf =~ /^>/
+        if f5_buf =~ /#{f3_id}/
+          f3_out.puts f3_ln
+          f3_out.puts f3_file.readline
+          f5_file.pos = f5_pos
           break
         else
-          f3_cs_file.readline
+          f5_file.readline
           ctr += 1
-        end #end if
-       end
+          f3_file.readline if ctr == 7
+          f5_file.pos = f5_pos if f5_file.eof?
+        end
+      end
     end
-    f5_cs_file.pos = break_pos
-  end #end top level if
-end 
+  end
+end    
 
-f3_cs_file.close
-f3_cs_out.close
-f5_cs_file.close
+f3_file.close 
+f3_out.close
+f5_file.rewind
 
-f5_cs_file = File.open(f3_cs_qual[1])
-f3_prime = File.open("/Users/cjose/Desktop/f3_out.csfasta", "r")
-
-while !f5_cs_file.eof? && !f3_prime.eof?
-  f3_pos = f3_prime.pos
-  f3_pr_ln = f3_prime.readline.chomp
-  f5_ln = f5_cs_file.readline.chomp
+# F5 against F3` => F5`
+f3_out = File.open("/Users/cjose/Desktop/f3out.csfasta","r")
+f5_out = File.new("/Users/cjose/Desktop/f5out.csfasta", "w")
+while !f5_file.eof? && !f3_out.eof?
+  f3_out_ln = f3_out.readline
+  f5_ln = f5_file.readline
+  f3_out_ln =~ /^>(\d*_\d*_\d*_)/
+  f3_out_id = $1
   f5_ln =~ /^>(\d*_\d*_\d*_)/
   f5_id = $1
-  f3_pr_ln =~ /^>(\d*_\d*_\d*_)/
-  f3_pr_id = $1
 
-  if f5_id == f3_pr_id
-    f5_cs_out.puts f5_ln
-    f5_cs_out.puts f5_cs_file.readline
-    f3_prime.readline 
+  if f5_id == f3_out_id 
+    f5_out.puts f5_ln
+    f5_out.puts f5_file.readline
+    f3_out.readline
   else
-    f3_prime.pos = f3_pos
-    f3_prime.readline
-    ctr = 0          
-    f5_pos = f5_cs_file.pos
-    while ctr < 10
-    f5_ln = f5_cs_file.readline.chomp
-   	if f5_ln =~ /^>/
-    	if f5_ln =~ /#{f3_pr_id}/
-      	f5_cs_out.puts f5_ln
-      	f5_cs_out.puts f5_cs_file.readline
-      	f3_prime.readline
-        f3_pos = f3_prime.pos
-        break
-      else
-      	f5_cs_file.readline
-        ctr += 1 
-      end # end if
+    f3_out.readline
+    f3_out_pos = f3_out.pos
+    ctr = 0
+    while ctr < 7
+      f3_out_buf = f3_out.readline
+      if f3_out_buf =~ /^>/
+        if f3_out_buf =~ /#{f5_id}/
+          f5_out.puts f5_ln
+          f5_out.puts f5_file.readline
+          f3_out.pos = f3_out_pos
+        else
+          f3_out.readline
+          ctr += 1
+          f5_file.readline if ctr == 7 && f3_out.eof?
+          f3_out.pos = f3_out_pos if f3_out.eof?
+        end
+      end
     end
-  end 
-  end # end top level if
-end 
+  end
+end
+ 
