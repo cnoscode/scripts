@@ -64,6 +64,9 @@ while !f5_file.eof? && !f3_out.eof?
     ctr = 0
     while ctr < 7
       f3_out_buf = f3_out.readline
+      if f3_out.eof?
+        f3_out.pos = f3_out_pos
+      end
       if f3_out_buf =~ /^>/
         if f3_out_buf =~ /#{f5_id}/
           f5_out.puts f5_ln
@@ -72,8 +75,6 @@ while !f5_file.eof? && !f3_out.eof?
         else
           f3_out.readline
           ctr += 1
-          f5_file.readline if ctr == 7 && f3_out.eof?
-          f3_out.pos = f3_out_pos if f3_out.eof?
         end
       end
     end
